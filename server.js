@@ -73,36 +73,44 @@ app.post("/createUser", (req, res) => {
   res.send("Post user to DB");
 });
 
-app.post("/createplaylist", (req, res) => {
-  let playlist = "";
-  req.on("data", data => {
-    playlist += data;
-  });
-
-  req.on("end", function() {
-    let obj = JSON.parse(playlist);
-    createPlaylist(obj, function(err, docs) {
-      console.log("this is the docs: ", docs);
-      res.send(JSON.stringify(docs));
+app.post(
+  "/createplaylist",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    let playlist = "";
+    req.on("data", data => {
+      playlist += data;
     });
-  });
-});
 
-app.post("/updateplaylist", (req, res) => {
-  let updatedPlaylist = "";
-  req.on("data", data => {
-    updatedPlaylist += data;
-  });
+    req.on("end", function() {
+      let obj = JSON.parse(playlist);
+      createPlaylist(obj, function(err, docs) {
+        console.log("this is the docs: ", docs);
+        res.send(JSON.stringify(docs));
+      });
+    });
+  }
+);
 
-  req.on("end", function() {
-    let obj = JSON.parse(updatedPlaylist);
-    updatePlaylist(obj, function(err, docs) {
-      console.log("this is the docs: ", docs);
+app.post(
+  "/updateplaylist",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    let updatedPlaylist = "";
+    req.on("data", data => {
+      updatedPlaylist += data;
+    });
+
+    req.on("end", function() {
+      let obj = JSON.parse(updatedPlaylist);
+      updatePlaylist(obj, function(err, docs) {
+        console.log("this is the docs: ", docs);
+        res.send("updated");
+      });
       res.send("updated");
     });
-    res.send("updated");
-  });
-});
+  }
+);
 
 app.get("/playlist", (req, res) => {
   //when user is logged in all the playlist should show up on the homepage
@@ -134,25 +142,29 @@ app.get("/search", (req, res) => {
   // REQ - genres, username, playlist name
   // res.send("Search");
 });
-app.post("/delete", (req, res) => {
-  let listToDelete = "";
-  // res.send(deleteList1)
+app.post(
+  "/delete",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    let listToDelete = "";
+    // res.send(deleteList1)
 
-  req.on("data", data => {
-    listToDelete += data;
-  });
+    req.on("data", data => {
+      listToDelete += data;
+    });
 
-  req.on("end", function() {
-    deleteListBackEnd(JSON.parse(listToDelete));
-    res.send("hej");
+    req.on("end", function() {
+      deleteListBackEnd(JSON.parse(listToDelete));
+      res.send("hej");
 
-    //   createPlaylist(obj, function(err,docs){
-    //     console.log("this is the docs: ", docs)
-    //     res.send(JSON.stringify(docs))
-    //})
-    //});
-  });
-});
+      //   createPlaylist(obj, function(err,docs){
+      //     console.log("this is the docs: ", docs)
+      //     res.send(JSON.stringify(docs))
+      //})
+      //});
+    });
+  }
+);
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
